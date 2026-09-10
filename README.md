@@ -34,15 +34,20 @@ Vitrine digital responsiva de perfumaria, cuidados pessoais e presentes. O clien
 ## Arquitetura
 
 ```text
-app/                 páginas, interface e rotas de API
-components/ui/       componentes reutilizáveis da interface
-db/                  conexão e schema do banco de dados
-drizzle/             migrações SQL
-lib/                 autenticação, configurações e acesso aos dados
-public/              identidade visual e imagens iniciais
+app/                   páginas, composição da aplicação e rotas de API
+components/admin/      interface do painel administrativo
+components/store/      páginas e componentes da vitrine
+components/ui/         elementos básicos reutilizáveis
+db/                    conexão e schema do banco de dados
+drizzle/               migrações SQL
+hooks/                 controladores de estado da interface
+lib/                   regras de domínio, autenticação e acesso aos dados
+public/                identidade visual e imagens iniciais
 ```
 
 O mesmo Cloudflare Worker entrega a interface e as APIs. O banco D1 armazena produtos, banners, configurações e controle de tentativas de login. O bucket R2 recebe as imagens enviadas pelo painel.
+
+As regras de catálogo, sacola, formatação e formulários são funções independentes da interface. O painel utiliza um controlador próprio, enquanto os componentes React permanecem focados na apresentação e nas interações do usuário.
 
 ## Executar localmente
 

@@ -34,6 +34,26 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        destination: 'https://gkpresentes.com.br/:path*',
+        permanent: true,
+        has: [
+          { type: 'header', key: 'x-forwarded-proto', value: 'http' },
+        ],
+      },
+      {
+        source: '/:path*',
+        destination: 'https://gkpresentes.com.br/:path*',
+        permanent: true,
+        has: [
+          { type: 'host', value: 'www.gkpresentes.com.br' },
+        ],
+      },
+    ];
+  },
   async headers() {
     return [
       {
@@ -43,6 +63,7 @@ const nextConfig: NextConfig = {
       {
         source: '/admin',
         headers: [
+          { key: 'Cache-Control', value: 'no-store' },
           { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' },
         ],
       },

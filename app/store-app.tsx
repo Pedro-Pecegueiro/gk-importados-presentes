@@ -18,6 +18,7 @@ import {
   ShoppingBag,
   Sparkles,
   Star,
+  Store,
   Trash2,
   X,
 } from 'lucide-react';
@@ -565,6 +566,70 @@ export default function StoreApp({
     window.open(whatsappHref, '_blank', 'noopener,noreferrer');
   }
 
+  if (view === 'admin') {
+    return (
+      <div className="min-h-screen bg-[#f3f0eb] text-foreground">
+        <header className="border-b border-border bg-[#24170f] text-white">
+          <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+            <div className="flex min-w-0 items-center gap-3">
+              <img
+                src="/gk-logo.png"
+                alt="Logo GK Importados e Presentes"
+                className="h-12 w-12 rounded-full border border-white/20 object-cover"
+              />
+              <div className="min-w-0">
+                <p className="truncate font-heading text-lg font-semibold">
+                  Painel GK
+                </p>
+                <p className="truncate text-xs uppercase tracking-[0.2em] text-white/60">
+                  Area administrativa
+                </p>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              className="border-white/25 bg-transparent text-white hover:bg-white/10 hover:text-white"
+              onClick={() => setRoute('home')}
+            >
+              <Store />
+              <span className="hidden sm:inline">Ver loja</span>
+            </Button>
+          </div>
+        </header>
+
+        {notice && (
+          <div className="fixed left-1/2 top-24 z-50 w-[min(92vw,440px)] -translate-x-1/2 rounded-lg border border-primary/25 bg-card px-4 py-3 text-sm shadow-xl">
+            <div className="flex items-center justify-between gap-4">
+              <span>{notice}</span>
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                onClick={() => setNotice('')}
+                aria-label="Fechar aviso"
+              >
+                <X />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {loading && !payload ? (
+          <LoadingState />
+        ) : error ? (
+          <ErrorState message={error} onRetry={loadStore} />
+        ) : payload ? (
+          <AdminView
+            payload={payload}
+            adminKey={adminKey}
+            setAdminKey={setAdminKey}
+            refresh={loadStore}
+            setNotice={setNotice}
+          />
+        ) : null}
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-40 border-b border-border/70 bg-background/92 backdrop-blur-xl">
@@ -603,12 +668,6 @@ export default function StoreApp({
             >
               Catalogo
             </Button>
-            <Button
-              variant={view === 'admin' ? 'secondary' : 'ghost'}
-              onClick={() => setRoute('admin')}
-            >
-              Painel
-            </Button>
           </nav>
 
           <div className="flex items-center gap-2">
@@ -639,15 +698,12 @@ export default function StoreApp({
 
         {mobileNavOpen && (
           <div className="border-t border-border bg-background px-4 py-3 md:hidden">
-            <div className="mx-auto grid max-w-7xl grid-cols-3 gap-2">
+            <div className="mx-auto grid max-w-7xl grid-cols-2 gap-2">
               <Button variant="secondary" onClick={() => setRoute('home')}>
                 Inicio
               </Button>
               <Button variant="secondary" onClick={() => setRoute('catalog')}>
                 Catalogo
-              </Button>
-              <Button variant="secondary" onClick={() => setRoute('admin')}>
-                Painel
               </Button>
             </div>
           </div>
@@ -701,16 +757,6 @@ export default function StoreApp({
               onCategory={setCategory}
               onProduct={openProduct}
               onAdd={addToCart}
-            />
-          )}
-
-          {view === 'admin' && payload && (
-            <AdminView
-              payload={payload}
-              adminKey={adminKey}
-              setAdminKey={setAdminKey}
-              refresh={loadStore}
-              setNotice={setNotice}
             />
           )}
         </>

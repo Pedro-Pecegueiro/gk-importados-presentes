@@ -1,8 +1,5 @@
-import {
-  getSettings,
-  requireAdmin,
-  updateSettings,
-} from '@/lib/store-data';
+import { requireAdmin } from '@/lib/admin-auth';
+import { getSettings, updateSettings } from '@/lib/store-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,25 +9,27 @@ export async function GET() {
   } catch (error) {
     console.error(error);
     return Response.json(
-      { error: 'Nao foi possivel carregar as configuracoes.' },
+      { error: 'Não foi possível carregar as configurações.' },
       { status: 500 },
     );
   }
 }
 
 export async function PATCH(request: Request) {
-  const forbidden = requireAdmin(request);
+  const forbidden = await requireAdmin(request);
 
   if (forbidden) {
     return forbidden;
   }
 
   try {
-    return Response.json({ settings: await updateSettings(await request.json()) });
+    return Response.json({
+      settings: await updateSettings(await request.json()),
+    });
   } catch (error) {
     console.error(error);
     return Response.json(
-      { error: 'Nao foi possivel salvar as configuracoes.' },
+      { error: 'Não foi possível salvar as configurações.' },
       { status: 500 },
     );
   }

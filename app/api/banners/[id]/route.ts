@@ -1,8 +1,5 @@
-import {
-  deleteBanner,
-  requireAdmin,
-  updateBanner,
-} from '@/lib/store-data';
+import { requireAdmin } from '@/lib/admin-auth';
+import { deleteBanner, updateBanner } from '@/lib/store-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +12,7 @@ async function getBannerId(context: BannerContext) {
 }
 
 export async function PATCH(request: Request, context: BannerContext) {
-  const forbidden = requireAdmin(request);
+  const forbidden = await requireAdmin(request);
 
   if (forbidden) {
     return forbidden;
@@ -29,7 +26,7 @@ export async function PATCH(request: Request, context: BannerContext) {
 
     if (!banner) {
       return Response.json(
-        { error: 'Banner nao encontrado.' },
+        { error: 'Banner não encontrado.' },
         { status: 404 },
       );
     }
@@ -38,14 +35,14 @@ export async function PATCH(request: Request, context: BannerContext) {
   } catch (error) {
     console.error(error);
     return Response.json(
-      { error: 'Nao foi possivel atualizar o banner.' },
+      { error: 'Não foi possível atualizar o banner.' },
       { status: 500 },
     );
   }
 }
 
 export async function DELETE(request: Request, context: BannerContext) {
-  const forbidden = requireAdmin(request);
+  const forbidden = await requireAdmin(request);
 
   if (forbidden) {
     return forbidden;
@@ -57,7 +54,7 @@ export async function DELETE(request: Request, context: BannerContext) {
   } catch (error) {
     console.error(error);
     return Response.json(
-      { error: 'Nao foi possivel excluir o banner.' },
+      { error: 'Não foi possível excluir o banner.' },
       { status: 500 },
     );
   }

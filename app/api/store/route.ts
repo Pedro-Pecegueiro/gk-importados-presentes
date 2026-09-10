@@ -10,7 +10,7 @@ export async function GET() {
   } catch (error) {
     console.error(error);
     return Response.json(
-      { error: 'Nao foi possivel carregar a loja.' },
+      { error: 'Não foi possível carregar a loja.' },
       { status: 500 },
     );
   }

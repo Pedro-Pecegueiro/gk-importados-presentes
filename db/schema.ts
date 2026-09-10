@@ -49,3 +49,19 @@ export const storeSettings = sqliteTable('store_settings', {
   value: text('setting_value').notNull(),
   updatedAt: text('updated_at').notNull(),
 });
+
+export const adminLoginAttempts = sqliteTable(
+  'admin_login_attempts',
+  {
+    key: text('attempt_key').primaryKey(),
+    attempts: integer('attempts').notNull().default(0),
+    windowStartedAt: integer('window_started_at').notNull(),
+    lockedUntil: integer('locked_until').notNull().default(0),
+    updatedAt: integer('updated_at').notNull(),
+  },
+  (table) => ({
+    idxAdminLoginAttemptsUpdatedAt: index(
+      'idx_admin_login_attempts_updated_at',
+    ).on(table.updatedAt),
+  }),
+);

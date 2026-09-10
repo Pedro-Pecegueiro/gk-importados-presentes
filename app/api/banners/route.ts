@@ -1,4 +1,5 @@
-import { createBanner, listBanners, requireAdmin } from '@/lib/store-data';
+import { requireAdmin } from '@/lib/admin-auth';
+import { createBanner, listBanners } from '@/lib/store-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,14 +9,14 @@ export async function GET() {
   } catch (error) {
     console.error(error);
     return Response.json(
-      { error: 'Nao foi possivel listar os banners.' },
+      { error: 'Não foi possível listar os banners.' },
       { status: 500 },
     );
   }
 }
 
 export async function POST(request: Request) {
-  const forbidden = requireAdmin(request);
+  const forbidden = await requireAdmin(request);
 
   if (forbidden) {
     return forbidden;
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error(error);
     return Response.json(
-      { error: 'Nao foi possivel cadastrar o banner.' },
+      { error: 'Não foi possível cadastrar o banner.' },
       { status: 500 },
     );
   }

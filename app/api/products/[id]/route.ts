@@ -1,8 +1,5 @@
-import {
-  deleteProduct,
-  requireAdmin,
-  updateProduct,
-} from '@/lib/store-data';
+import { requireAdmin } from '@/lib/admin-auth';
+import { deleteProduct, updateProduct } from '@/lib/store-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +12,7 @@ async function getProductId(context: ProductContext) {
 }
 
 export async function PATCH(request: Request, context: ProductContext) {
-  const forbidden = requireAdmin(request);
+  const forbidden = await requireAdmin(request);
 
   if (forbidden) {
     return forbidden;
@@ -29,7 +26,7 @@ export async function PATCH(request: Request, context: ProductContext) {
 
     if (!product) {
       return Response.json(
-        { error: 'Produto nao encontrado.' },
+        { error: 'Produto não encontrado.' },
         { status: 404 },
       );
     }
@@ -38,14 +35,14 @@ export async function PATCH(request: Request, context: ProductContext) {
   } catch (error) {
     console.error(error);
     return Response.json(
-      { error: 'Nao foi possivel atualizar o produto.' },
+      { error: 'Não foi possível atualizar o produto.' },
       { status: 500 },
     );
   }
 }
 
 export async function DELETE(request: Request, context: ProductContext) {
-  const forbidden = requireAdmin(request);
+  const forbidden = await requireAdmin(request);
 
   if (forbidden) {
     return forbidden;
@@ -57,7 +54,7 @@ export async function DELETE(request: Request, context: ProductContext) {
   } catch (error) {
     console.error(error);
     return Response.json(
-      { error: 'Nao foi possivel excluir o produto.' },
+      { error: 'Não foi possível excluir o produto.' },
       { status: 500 },
     );
   }

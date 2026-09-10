@@ -1,9 +1,5 @@
 import { env } from 'cloudflare:workers';
-import {
-  ADMIN_ACCESS_CODE,
-  PRODUCT_CATEGORIES,
-  WHATSAPP_NUMBER,
-} from '@/lib/store-config';
+import { PRODUCT_CATEGORIES, WHATSAPP_NUMBER } from '@/lib/store-config';
 import type {
   Banner,
   BannerInput,
@@ -51,11 +47,11 @@ type SettingRow = {
 const demoProducts: Array<Omit<ProductInput, 'sortOrder'> & { slug: string }> =
   [
     {
-      name: 'Perfume Ambar Dourado 100ml',
+      name: 'Perfume Âmbar Dourado 100ml',
       slug: 'perfume-ambar-dourado-100ml',
-      description: 'Fragrancia elegante com notas ambaradas e fundo cremoso.',
+      description: 'Fragrância elegante com notas âmbaradas e fundo cremoso.',
       details:
-        'Uma escolha marcante para noite, presente especial ou rotina de quem gosta de perfumes com presenca sofisticada.',
+        'Uma escolha marcante para a noite, presente especial ou rotina de quem gosta de perfumes com presença sofisticada.',
       priceCents: 18990,
       category: 'Perfumes',
       imageUrl: '/gk-cuidados.png',
@@ -67,11 +63,11 @@ const demoProducts: Array<Omit<ProductInput, 'sortOrder'> & { slug: string }> =
     {
       name: 'Body Splash Flores Nobres 200ml',
       slug: 'body-splash-flores-nobres-200ml',
-      description: 'Toque floral leve para renovar a sensacao de frescor.',
+      description: 'Toque floral leve para renovar a sensação de frescor.',
       details:
-        'Ideal para uso diario, com fixacao delicada e acabamento confortavel na pele.',
+        'Ideal para uso diário, com fixação delicada e acabamento confortável na pele.',
       priceCents: 6990,
-      category: 'Cosméticos',
+      category: 'Body Splash',
       imageUrl: '/gk-cuidados.png',
       available: true,
       featured: true,
@@ -81,9 +77,9 @@ const demoProducts: Array<Omit<ProductInput, 'sortOrder'> & { slug: string }> =
     {
       name: 'Hidratante Vanilla Silk 250g',
       slug: 'hidratante-vanilla-silk-250g',
-      description: 'Hidratacao acetinada com aroma quente e envolvente.',
+      description: 'Hidratação acetinada com aroma quente e envolvente.',
       details:
-        'Textura macia, rapida absorcao e fragrancia aconchegante para complementar o perfume favorito.',
+        'Textura macia, rápida absorção e fragrância aconchegante para complementar o perfume favorito.',
       priceCents: 5490,
       category: 'Hidratantes',
       imageUrl: '/gk-cuidados.png',
@@ -93,11 +89,11 @@ const demoProducts: Array<Omit<ProductInput, 'sortOrder'> & { slug: string }> =
       giftKit: false,
     },
     {
-      name: 'Desodorante Creme Algodao 80g',
+      name: 'Desodorante Creme Algodão 80g',
       slug: 'desodorante-creme-algodao-80g',
-      description: 'Protecao suave com toque limpo para a rotina.',
+      description: 'Proteção suave com toque limpo para a rotina.',
       details:
-        'Opcao pratica para quem procura conforto, perfume discreto e cuidado diario.',
+        'Opção prática para quem procura conforto, perfume discreto e cuidado diário.',
       priceCents: 3490,
       category: 'Desodorantes',
       imageUrl: '/gk-cuidados.png',
@@ -109,9 +105,9 @@ const demoProducts: Array<Omit<ProductInput, 'sortOrder'> & { slug: string }> =
     {
       name: 'Kit Presente Glow',
       slug: 'kit-presente-glow',
-      description: 'Caixa presenteavel com perfume, hidratante e chocolates.',
+      description: 'Caixa presenteável com perfume, hidratante e chocolates.',
       details:
-        'Montagem pronta para datas especiais, com combinacao equilibrada entre cuidado pessoal e delicadeza.',
+        'Montagem pronta para datas especiais, com combinação equilibrada entre cuidado pessoal e delicadeza.',
       priceCents: 15990,
       category: 'Kits de presente',
       imageUrl: '/gk-kit-presente.png',
@@ -125,7 +121,7 @@ const demoProducts: Array<Omit<ProductInput, 'sortOrder'> & { slug: string }> =
       slug: 'kit-carinho-essencial',
       description: 'Presente compacto com itens selecionados da loja.',
       details:
-        'Boa opcao para lembrancas elegantes, amigo secreto ou gesto de agradecimento.',
+        'Boa opção para lembranças elegantes, amigo secreto ou gesto de agradecimento.',
       priceCents: 8990,
       category: 'Kits de presente',
       imageUrl: '/gk-kit-presente.png',
@@ -137,9 +133,9 @@ const demoProducts: Array<Omit<ProductInput, 'sortOrder'> & { slug: string }> =
     {
       name: 'Carteira Mini Champagne',
       slug: 'carteira-mini-champagne',
-      description: 'Acessorio delicado para compor kits e presentes.',
+      description: 'Acessório delicado para compor kits e presentes.',
       details:
-        'Acabamento elegante, tamanho pratico e tonalidade neutra para uso diario.',
+        'Acabamento elegante, tamanho prático e tonalidade neutra para uso diário.',
       priceCents: 4990,
       category: 'Acessórios',
       imageUrl: '/gk-kit-presente.png',
@@ -153,9 +149,9 @@ const demoProducts: Array<Omit<ProductInput, 'sortOrder'> & { slug: string }> =
       slug: 'bombons-trufados-premium',
       description: 'Caixa de chocolates para acompanhar presentes especiais.',
       details:
-        'Sugestao para complementar kits, lembrancas romanticas e cestas personalizadas.',
+        'Sugestão para acompanhar cestas prontas, lembranças românticas e presentes especiais.',
       priceCents: 4290,
-      category: 'Chocolates',
+      category: 'Outros',
       imageUrl: '/gk-kit-presente.png',
       available: true,
       featured: false,
@@ -163,11 +159,11 @@ const demoProducts: Array<Omit<ProductInput, 'sortOrder'> & { slug: string }> =
       giftKit: false,
     },
     {
-      name: 'Perfume Citrus Classico 100ml',
+      name: 'Perfume Citrus Clássico 100ml',
       slug: 'perfume-citrus-classico-100ml',
-      description: 'Fragrancia fresca com saida citrica e fundo elegante.',
+      description: 'Fragrância fresca com saída cítrica e fundo elegante.',
       details:
-        'Versatil para trabalho, encontros e dias quentes, com assinatura limpa e sofisticada.',
+        'Versátil para trabalho, encontros e dias quentes, com assinatura limpa e sofisticada.',
       priceCents: 14990,
       category: 'Perfumes',
       imageUrl: '/gk-cuidados.png',
@@ -180,10 +176,10 @@ const demoProducts: Array<Omit<ProductInput, 'sortOrder'> & { slug: string }> =
 
 const demoBanners: BannerInput[] = [
   {
-    title: 'Presentes elegantes para cada ocasiao',
+    title: 'Presentes elegantes para cada ocasião',
     subtitle:
-      'Perfumes, cuidados e kits com acabamento de boutique para transformar escolhas simples em gestos memoraveis.',
-    ctaLabel: 'Ver catalogo',
+      'Perfumes, cuidados e kits com acabamento de boutique para transformar escolhas simples em gestos memoráveis.',
+    ctaLabel: 'Ver catálogo',
     imageUrl: '/gk-kit-presente.png',
     active: true,
     sortOrder: 1,
@@ -191,7 +187,7 @@ const demoBanners: BannerInput[] = [
   {
     title: 'Perfumaria com curadoria acolhedora',
     subtitle:
-      'Produtos selecionados, sacola rapida e atendimento humano pelo WhatsApp antes da confirmacao final.',
+      'Produtos selecionados, sacola rápida e atendimento humano pelo WhatsApp antes da confirmação final.',
     ctaLabel: 'Montar sacola',
     imageUrl: '/gk-cuidados.png',
     active: true,
@@ -201,7 +197,7 @@ const demoBanners: BannerInput[] = [
 
 function getDatabase() {
   if (!env.DB) {
-    throw new Error('DB binding is not available.');
+    throw new Error('Banco de dados indisponível.');
   }
 
   return env.DB;
@@ -270,11 +266,31 @@ function textField(value: unknown, fallback: string, maxLength: number) {
   return (trimmed || fallback).slice(0, maxLength);
 }
 
+function imageUrlField(value: unknown, fallback: string) {
+  const candidate = textField(value, fallback, 500);
+
+  if (candidate.startsWith('/') && !candidate.startsWith('//')) {
+    return candidate;
+  }
+
+  try {
+    const url = new URL(candidate);
+    return url.protocol === 'https:' ? url.toString() : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 function booleanField(value: unknown, fallback: boolean) {
   return typeof value === 'boolean' ? value : fallback;
 }
 
-function numberField(value: unknown, fallback: number, min: number, max: number) {
+function numberField(
+  value: unknown,
+  fallback: number,
+  min: number,
+  max: number,
+) {
   const parsed =
     typeof value === 'number' ? value : Number.parseInt(String(value), 10);
 
@@ -290,17 +306,21 @@ export function sanitizeProductInput(value: unknown): ProductInput {
 
   return {
     name: textField(input.name, 'Novo produto', 120),
-    description: textField(input.description, 'Descricao breve do produto.', 240),
+    description: textField(
+      input.description,
+      'Descrição breve do produto.',
+      240,
+    ),
     details: textField(
       input.details,
-      'Detalhes do produto, uso recomendado e composicao do presente.',
+      'Detalhes do produto, uso recomendado e composição do presente.',
       900,
     ),
     priceCents: numberField(input.priceCents, 0, 0, 99999900),
     category: PRODUCT_CATEGORIES.includes(String(input.category))
       ? String(input.category)
       : 'Outros',
-    imageUrl: textField(input.imageUrl, '/gk-cuidados.png', 500),
+    imageUrl: imageUrlField(input.imageUrl, '/gk-cuidados.png'),
     available: booleanField(input.available, true),
     featured: booleanField(input.featured, false),
     bestseller: booleanField(input.bestseller, false),
@@ -315,25 +335,11 @@ export function sanitizeBannerInput(value: unknown): BannerInput {
   return {
     title: textField(input.title, 'Nova campanha', 120),
     subtitle: textField(input.subtitle, 'Mensagem principal do banner.', 280),
-    ctaLabel: textField(input.ctaLabel, 'Ver catalogo', 40),
-    imageUrl: textField(input.imageUrl, '/gk-kit-presente.png', 500),
+    ctaLabel: textField(input.ctaLabel, 'Ver catálogo', 40),
+    imageUrl: imageUrlField(input.imageUrl, '/gk-kit-presente.png'),
     active: booleanField(input.active, true),
     sortOrder: numberField(input.sortOrder, 100, 0, 9999),
   };
-}
-
-export function requireAdmin(request: Request) {
-  const provided = request.headers.get('x-admin-key')?.trim();
-  const expected = env.ADMIN_ACCESS_CODE || ADMIN_ACCESS_CODE;
-
-  if (!provided || provided !== expected) {
-    return Response.json(
-      { error: 'Codigo administrativo invalido.' },
-      { status: 401 },
-    );
-  }
-
-  return null;
 }
 
 export async function ensureSeedData() {
@@ -424,8 +430,9 @@ export async function getSettings(): Promise<StoreSettings> {
   );
 
   return {
-    WHATSAPP_NUMBER:
-      String(values.WHATSAPP_NUMBER || env.WHATSAPP_NUMBER || WHATSAPP_NUMBER),
+    WHATSAPP_NUMBER: String(
+      values.WHATSAPP_NUMBER || env.WHATSAPP_NUMBER || WHATSAPP_NUMBER,
+    ),
   };
 }
 

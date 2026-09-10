@@ -13,9 +13,26 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'GK Importados e Presentes',
+  metadataBase: new URL('https://gkpresentes.com.br'),
+  title: 'GK Importados e Presentes | Perfumaria e presentes em Suzano',
   description:
-    'Catalogo virtual da GK Importados e Presentes com sacola, painel administrativo e pedidos pelo WhatsApp.',
+    'Perfumes, autocuidado e presentes selecionados em Suzano. Monte sua sacola e receba atendimento personalizado pelo WhatsApp.',
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    locale: 'pt_BR',
+    url: '/',
+    siteName: 'GK Importados e Presentes',
+    title: 'GK Importados e Presentes',
+    description:
+      'Perfumes, autocuidado e presentes selecionados com atendimento personalizado pelo WhatsApp.',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'GK Importados e Presentes',
+    description:
+      'Perfumes, autocuidado e presentes selecionados com atendimento personalizado pelo WhatsApp.',
+  },
 };
 
 export default function RootLayout({

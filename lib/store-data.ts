@@ -44,157 +44,6 @@ type SettingRow = {
   setting_value: string;
 };
 
-const demoProducts: Array<Omit<ProductInput, 'sortOrder'> & { slug: string }> =
-  [
-    {
-      name: 'Perfume Âmbar Dourado 100ml',
-      slug: 'perfume-ambar-dourado-100ml',
-      description: 'Fragrância elegante com notas âmbaradas e fundo cremoso.',
-      details:
-        'Uma escolha marcante para a noite, presente especial ou rotina de quem gosta de perfumes com presença sofisticada.',
-      priceCents: 18990,
-      category: 'Perfumes',
-      imageUrl: '/gk-cuidados.png',
-      available: true,
-      featured: true,
-      bestseller: true,
-      giftKit: false,
-    },
-    {
-      name: 'Body Splash Flores Nobres 200ml',
-      slug: 'body-splash-flores-nobres-200ml',
-      description: 'Toque floral leve para renovar a sensação de frescor.',
-      details:
-        'Ideal para uso diário, com fixação delicada e acabamento confortável na pele.',
-      priceCents: 6990,
-      category: 'Body Splash',
-      imageUrl: '/gk-cuidados.png',
-      available: true,
-      featured: true,
-      bestseller: false,
-      giftKit: false,
-    },
-    {
-      name: 'Hidratante Vanilla Silk 250g',
-      slug: 'hidratante-vanilla-silk-250g',
-      description: 'Hidratação acetinada com aroma quente e envolvente.',
-      details:
-        'Textura macia, rápida absorção e fragrância aconchegante para complementar o perfume favorito.',
-      priceCents: 5490,
-      category: 'Hidratantes',
-      imageUrl: '/gk-cuidados.png',
-      available: true,
-      featured: false,
-      bestseller: true,
-      giftKit: false,
-    },
-    {
-      name: 'Desodorante Creme Algodão 80g',
-      slug: 'desodorante-creme-algodao-80g',
-      description: 'Proteção suave com toque limpo para a rotina.',
-      details:
-        'Opção prática para quem procura conforto, perfume discreto e cuidado diário.',
-      priceCents: 3490,
-      category: 'Desodorantes',
-      imageUrl: '/gk-cuidados.png',
-      available: true,
-      featured: false,
-      bestseller: false,
-      giftKit: false,
-    },
-    {
-      name: 'Kit Presente Glow',
-      slug: 'kit-presente-glow',
-      description: 'Caixa presenteável com perfume, hidratante e chocolates.',
-      details:
-        'Montagem pronta para datas especiais, com combinação equilibrada entre cuidado pessoal e delicadeza.',
-      priceCents: 15990,
-      category: 'Kits de presente',
-      imageUrl: '/gk-kit-presente.png',
-      available: true,
-      featured: true,
-      bestseller: true,
-      giftKit: true,
-    },
-    {
-      name: 'Kit Carinho Essencial',
-      slug: 'kit-carinho-essencial',
-      description: 'Presente compacto com itens selecionados da loja.',
-      details:
-        'Boa opção para lembranças elegantes, amigo secreto ou gesto de agradecimento.',
-      priceCents: 8990,
-      category: 'Kits de presente',
-      imageUrl: '/gk-kit-presente.png',
-      available: true,
-      featured: false,
-      bestseller: false,
-      giftKit: true,
-    },
-    {
-      name: 'Carteira Mini Champagne',
-      slug: 'carteira-mini-champagne',
-      description: 'Acessório delicado para compor kits e presentes.',
-      details:
-        'Acabamento elegante, tamanho prático e tonalidade neutra para uso diário.',
-      priceCents: 4990,
-      category: 'Acessórios',
-      imageUrl: '/gk-kit-presente.png',
-      available: true,
-      featured: false,
-      bestseller: true,
-      giftKit: false,
-    },
-    {
-      name: 'Bombons Trufados Premium',
-      slug: 'bombons-trufados-premium',
-      description: 'Caixa de chocolates para acompanhar presentes especiais.',
-      details:
-        'Sugestão para acompanhar cestas prontas, lembranças românticas e presentes especiais.',
-      priceCents: 4290,
-      category: 'Outros',
-      imageUrl: '/gk-kit-presente.png',
-      available: true,
-      featured: false,
-      bestseller: false,
-      giftKit: false,
-    },
-    {
-      name: 'Perfume Citrus Clássico 100ml',
-      slug: 'perfume-citrus-classico-100ml',
-      description: 'Fragrância fresca com saída cítrica e fundo elegante.',
-      details:
-        'Versátil para trabalho, encontros e dias quentes, com assinatura limpa e sofisticada.',
-      priceCents: 14990,
-      category: 'Perfumes',
-      imageUrl: '/gk-cuidados.png',
-      available: false,
-      featured: false,
-      bestseller: false,
-      giftKit: false,
-    },
-  ];
-
-const demoBanners: BannerInput[] = [
-  {
-    title: 'Presentes elegantes para cada ocasião',
-    subtitle:
-      'Perfumes, cuidados e kits com acabamento de boutique para transformar escolhas simples em gestos memoráveis.',
-    ctaLabel: 'Ver catálogo',
-    imageUrl: '/gk-kit-presente.png',
-    active: true,
-    sortOrder: 1,
-  },
-  {
-    title: 'Perfumaria com curadoria acolhedora',
-    subtitle:
-      'Produtos selecionados, sacola rápida e atendimento humano pelo WhatsApp antes da confirmação final.',
-    ctaLabel: 'Montar sacola',
-    imageUrl: '/gk-cuidados.png',
-    active: true,
-    sortOrder: 2,
-  },
-];
-
 function getDatabase() {
   if (!env.DB) {
     throw new Error('Banco de dados indisponível.');
@@ -342,84 +191,6 @@ export function sanitizeBannerInput(value: unknown): BannerInput {
   };
 }
 
-export async function ensureSeedData() {
-  const db = getDatabase();
-  const timestamp = now();
-  const productCount = await db
-    .prepare('SELECT COUNT(*) AS count FROM products')
-    .first<{ count: number }>();
-
-  if ((productCount?.count ?? 0) === 0) {
-    await db.batch(
-      demoProducts.map((product, index) =>
-        db
-          .prepare(
-            `INSERT INTO products (
-              id, name, slug, description, details, price_cents, category,
-              image_url, available, featured, bestseller, gift_kit, sort_order,
-              created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          )
-          .bind(
-            crypto.randomUUID(),
-            product.name,
-            product.slug,
-            product.description,
-            product.details,
-            product.priceCents,
-            product.category,
-            product.imageUrl,
-            product.available ? 1 : 0,
-            product.featured ? 1 : 0,
-            product.bestseller ? 1 : 0,
-            product.giftKit ? 1 : 0,
-            (index + 1) * 10,
-            timestamp,
-            timestamp,
-          ),
-      ),
-    );
-  }
-
-  const bannerCount = await db
-    .prepare('SELECT COUNT(*) AS count FROM banners')
-    .first<{ count: number }>();
-
-  if ((bannerCount?.count ?? 0) === 0) {
-    await db.batch(
-      demoBanners.map((banner) =>
-        db
-          .prepare(
-            `INSERT INTO banners (
-              id, title, subtitle, cta_label, image_url, active, sort_order,
-              created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          )
-          .bind(
-            crypto.randomUUID(),
-            banner.title,
-            banner.subtitle,
-            banner.ctaLabel,
-            banner.imageUrl,
-            banner.active ? 1 : 0,
-            banner.sortOrder,
-            timestamp,
-            timestamp,
-          ),
-      ),
-    );
-  }
-
-  await db
-    .prepare(
-      `INSERT INTO store_settings (setting_key, setting_value, updated_at)
-       VALUES (?, ?, ?)
-       ON CONFLICT(setting_key) DO NOTHING`,
-    )
-    .bind('WHATSAPP_NUMBER', env.WHATSAPP_NUMBER || WHATSAPP_NUMBER, timestamp)
-    .run();
-}
-
 export async function getSettings(): Promise<StoreSettings> {
   const db = getDatabase();
   const rows = await db
@@ -489,8 +260,6 @@ export async function listBanners() {
 }
 
 export async function getStorePayload(): Promise<StorePayload> {
-  await ensureSeedData();
-
   const [products, banners, settings] = await Promise.all([
     listProducts(),
     listBanners(),
@@ -501,8 +270,6 @@ export async function getStorePayload(): Promise<StorePayload> {
 }
 
 export async function createProduct(rawInput: unknown) {
-  await ensureSeedData();
-
   const db = getDatabase();
   const input = sanitizeProductInput(rawInput);
   const timestamp = now();
@@ -552,8 +319,6 @@ export async function createProduct(rawInput: unknown) {
 }
 
 export async function updateProduct(id: string, rawInput: unknown) {
-  await ensureSeedData();
-
   const db = getDatabase();
   const input = sanitizeProductInput(rawInput);
   const timestamp = now();
@@ -587,8 +352,6 @@ export async function updateProduct(id: string, rawInput: unknown) {
 }
 
 export async function deleteProduct(id: string) {
-  await ensureSeedData();
-
   const db = getDatabase();
   await db.prepare('DELETE FROM products WHERE id = ?').bind(id).run();
 }
@@ -610,8 +373,6 @@ export async function getProductById(id: string) {
 }
 
 export async function createBanner(rawInput: unknown) {
-  await ensureSeedData();
-
   const db = getDatabase();
   const input = sanitizeBannerInput(rawInput);
   const timestamp = now();
@@ -641,8 +402,6 @@ export async function createBanner(rawInput: unknown) {
 }
 
 export async function updateBanner(id: string, rawInput: unknown) {
-  await ensureSeedData();
-
   const db = getDatabase();
   const input = sanitizeBannerInput(rawInput);
   const timestamp = now();
@@ -670,8 +429,6 @@ export async function updateBanner(id: string, rawInput: unknown) {
 }
 
 export async function deleteBanner(id: string) {
-  await ensureSeedData();
-
   const db = getDatabase();
   await db.prepare('DELETE FROM banners WHERE id = ?').bind(id).run();
 }

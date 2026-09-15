@@ -240,19 +240,6 @@ export function AdminView({
                 maxLength={120}
               />
             </Field>
-            <Field label="Descrição curta">
-              <Textarea
-                value={productForm.description}
-                onChange={(event) =>
-                  setProductForm({
-                    ...productForm,
-                    description: event.target.value,
-                  })
-                }
-                required
-                maxLength={240}
-              />
-            </Field>
             <Field label="Detalhes do produto">
               <Textarea
                 value={productForm.details}

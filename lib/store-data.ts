@@ -152,19 +152,16 @@ function numberField(
 
 export function sanitizeProductInput(value: unknown): ProductInput {
   const input = (value ?? {}) as Partial<ProductInput>;
+  const details = textField(
+    input.details,
+    'Detalhes do produto, uso recomendado e composição do presente.',
+    900,
+  );
 
   return {
     name: textField(input.name, 'Novo produto', 120),
-    description: textField(
-      input.description,
-      'Descrição breve do produto.',
-      240,
-    ),
-    details: textField(
-      input.details,
-      'Detalhes do produto, uso recomendado e composição do presente.',
-      900,
-    ),
+    description: textField(details, 'Descrição do produto.', 240),
+    details,
     priceCents: numberField(input.priceCents, 0, 0, 99999900),
     category: PRODUCT_CATEGORIES.includes(String(input.category))
       ? String(input.category)

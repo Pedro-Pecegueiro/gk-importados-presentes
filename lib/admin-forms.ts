@@ -6,7 +6,7 @@ import type {
   ProductInput,
 } from '@/lib/store-types';
 
-export type ProductFormState = ProductInput & {
+export type ProductFormState = Omit<ProductInput, 'description'> & {
   id?: string;
 };
 
@@ -17,7 +17,6 @@ export type BannerFormState = BannerInput & {
 export function createEmptyProductForm(sortOrder = 100): ProductFormState {
   return {
     name: '',
-    description: '',
     details: '',
     priceCents: 0,
     category: PRODUCT_CATEGORIES[0],
@@ -45,7 +44,6 @@ export function productToForm(product: Product): ProductFormState {
   return {
     id: product.id,
     name: product.name,
-    description: product.description,
     details: product.details,
     priceCents: product.priceCents,
     category: product.category,
@@ -83,7 +81,7 @@ export function priceCentsFromInput(value: string) {
 
 export function productInputFromForm(form: ProductFormState): ProductInput {
   const { id: _id, ...input } = form;
-  return input;
+  return { ...input, description: input.details };
 }
 
 export function bannerInputFromForm(form: BannerFormState): BannerInput {

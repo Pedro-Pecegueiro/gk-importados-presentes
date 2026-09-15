@@ -883,7 +883,7 @@ export default function StoreApp({
                   </DialogDescription>
                 </DialogHeader>
 
-                <p className="mt-5 text-sm leading-7 text-muted-foreground">
+                <p className="mt-5 whitespace-pre-line text-sm leading-7 text-muted-foreground">
                   {selectedProduct.details}
                 </p>
 

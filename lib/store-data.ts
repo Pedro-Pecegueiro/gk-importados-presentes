@@ -115,6 +115,16 @@ function textField(value: unknown, fallback: string, maxLength: number) {
   return (trimmed || fallback).slice(0, maxLength);
 }
 
+function productSummary(details: string) {
+  const summary = details
+    .split(/\r?\n/)
+    .map((line) => line.trim().replace(/\s+/g, ' '))
+    .filter(Boolean)
+    .join(', ');
+
+  return summary.slice(0, 240);
+}
+
 function imageUrlField(value: unknown, fallback: string) {
   const candidate = textField(value, fallback, 500);
 
@@ -160,7 +170,7 @@ export function sanitizeProductInput(value: unknown): ProductInput {
 
   return {
     name: textField(input.name, 'Novo produto', 120),
-    description: textField(details, 'Descrição do produto.', 240),
+    description: productSummary(details),
     details,
     priceCents: numberField(input.priceCents, 0, 0, 99999900),
     category: PRODUCT_CATEGORIES.includes(String(input.category))

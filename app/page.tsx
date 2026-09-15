@@ -1,5 +1,9 @@
 import StoreApp from './store-app';
+import { getInitialStorePayload } from '@/lib/store-initial';
 
-export default function Home() {
-  return <StoreApp initialView="home" />;
+export const dynamic = 'force-dynamic';
+
+export default async function Home() {
+  const initialPayload = await getInitialStorePayload();
+  return <StoreApp initialView="home" initialPayload={initialPayload} />;
 }

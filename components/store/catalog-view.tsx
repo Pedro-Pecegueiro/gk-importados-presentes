@@ -1,12 +1,14 @@
 import { Search } from 'lucide-react';
 import { CategoryPill, ProductCard } from '@/components/store/product-card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
   NativeSelect,
   NativeSelectOption,
 } from '@/components/ui/native-select';
 import { PRODUCT_CATEGORIES, STORE_CONTACT_COPY } from '@/lib/store-config';
+import { formatProductCount } from '@/lib/store-format';
 import type { Product } from '@/lib/store-types';
 
 export function CatalogView({
@@ -31,13 +33,13 @@ export function CatalogView({
   onAdd: (product: Product) => void;
 }) {
   return (
-    <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       <div className="grid gap-6 lg:grid-cols-[0.84fr_1.16fr]">
         <div>
           <Badge variant="outline" className="mb-4 border-primary/35">
             Catálogo
           </Badge>
-          <h1 className="font-heading text-4xl font-semibold leading-tight sm:text-5xl">
+          <h1 className="font-heading text-3xl font-semibold leading-tight sm:text-5xl">
             Monte sua sacola e fale diretamente com a GK.
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground">
@@ -51,9 +53,13 @@ export function CatalogView({
               <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 className="h-11 pl-9"
+                type="search"
                 value={search}
                 onChange={(event) => onSearch(event.target.value)}
                 placeholder="Pesquisar por perfume, body splash ou kit..."
+                autoComplete="off"
+                enterKeyHint="search"
+                aria-describedby="catalog-results"
               />
             </label>
             <NativeSelect
@@ -72,7 +78,7 @@ export function CatalogView({
               ))}
             </NativeSelect>
           </div>
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-4 hidden flex-wrap gap-2 sm:flex">
             <CategoryPill
               active={category === 'Todos'}
               label={`Todos (${allProducts.length})`}
@@ -87,10 +93,18 @@ export function CatalogView({
               />
             ))}
           </div>
+          <p
+            id="catalog-results"
+            className="mt-3 text-xs font-medium text-muted-foreground"
+            aria-live="polite"
+          >
+            {formatProductCount(products.length)} encontrado
+            {products.length === 1 ? '' : 's'}
+          </p>
         </div>
       </div>
 
-      <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="mt-7 grid gap-4 sm:mt-8 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
         {products.map((product) => (
           <ProductCard
             key={product.id}
@@ -110,6 +124,16 @@ export function CatalogView({
           <p className="mt-2 text-sm text-muted-foreground">
             Tente buscar outro nome ou trocar a categoria.
           </p>
+          <Button
+            variant="outline"
+            className="mt-5"
+            onClick={() => {
+              onSearch('');
+              onCategory('Todos');
+            }}
+          >
+            Limpar filtros
+          </Button>
         </div>
       )}
     </main>

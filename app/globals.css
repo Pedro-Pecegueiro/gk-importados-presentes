@@ -137,6 +137,7 @@ body {
   html {
     @apply font-sans;
     scroll-behavior: smooth;
+    scroll-padding-top: 8rem;
   }
   button,
   a,
@@ -144,5 +145,23 @@ body {
   textarea,
   select {
     letter-spacing: 0;
+  }
+  a:focus-visible {
+    @apply rounded-sm outline-none ring-3 ring-ring/50;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }

@@ -4,10 +4,13 @@ import { Button } from '@/components/ui/button';
 export function StoreLoadingState() {
   return (
     <main className="grid min-h-[calc(100vh-80px)] place-items-center px-4">
-      <div className="flex items-center gap-3 rounded-lg border border-border bg-card px-5 py-4 shadow-sm">
+      <output
+        className="flex items-center gap-3 rounded-lg border border-border bg-card px-5 py-4 shadow-sm"
+        aria-live="polite"
+      >
         <Loader2 className="size-5 animate-spin text-primary" />
         <span className="text-sm text-muted-foreground">Carregando a loja</span>
-      </div>
+      </output>
     </main>
   );
 }

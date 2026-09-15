@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowUpRight,
   Menu,
@@ -10,7 +10,6 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
-import { AdminView } from '@/components/admin/admin-view';
 import { CatalogView } from '@/components/store/catalog-view';
 import { HomeView } from '@/components/store/home-view';
 import { QuantityStepper } from '@/components/store/product-card';
@@ -20,7 +19,7 @@ import {
   StoreLoadingState,
 } from '@/components/store/store-status';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -49,10 +48,12 @@ import {
 } from '@/lib/store-catalog';
 import { formatMoney, isPrototypeImage } from '@/lib/store-format';
 import type { Product, StorePayload } from '@/lib/store-types';
+import { cn } from '@/lib/utils';
 
 type StoreAppProps = {
   initialView: 'home' | 'catalog' | 'admin';
   initialProductSlug?: string;
+  initialPayload?: StorePayload | null;
 };
 
 type WebMcpTool = {
@@ -79,6 +80,11 @@ declare global {
 }
 
 const cartStorageKey = 'gk-importados-sacola';
+const AdminView = lazy(() =>
+  import('@/components/admin/admin-view').then((module) => ({
+    default: module.AdminView,
+  })),
+);
 
 function inputRecord(input: unknown) {
   if (!input || typeof input !== 'object' || Array.isArray(input)) {
@@ -91,10 +97,18 @@ function inputRecord(input: unknown) {
 export default function StoreApp({
   initialView,
   initialProductSlug,
+  initialPayload,
 }: StoreAppProps) {
+  const initialProduct = initialProductSlug
+    ? initialPayload?.products.find(
+        (product) => product.slug === initialProductSlug,
+      )
+    : null;
   const [view, setView] = useState(initialView);
-  const [payload, setPayload] = useState<StorePayload | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [payload, setPayload] = useState<StorePayload | null>(
+    initialPayload ?? null,
+  );
+  const [loading, setLoading] = useState(!initialPayload);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [search, setSearch] = useState('');
@@ -103,13 +117,18 @@ export default function StoreApp({
   const [cartReady, setCartReady] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [detailOpen, setDetailOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(
+    initialProduct ?? null,
+  );
+  const [detailOpen, setDetailOpen] = useState(Boolean(initialProduct));
   const [detailQuantity, setDetailQuantity] = useState(1);
   const [adminAuthenticated, setAdminAuthenticated] = useState<boolean | null>(
     null,
   );
-  const [openedInitialProduct, setOpenedInitialProduct] = useState(false);
+  const [openedInitialProduct, setOpenedInitialProduct] = useState(
+    Boolean(initialProduct),
+  );
+  const productReturnPath = useRef('/catalogo');
 
   async function loadStore() {
     setLoading(true);
@@ -136,8 +155,10 @@ export default function StoreApp({
   }
 
   useEffect(() => {
-    void loadStore();
-  }, []);
+    if (!initialPayload) {
+      void loadStore();
+    }
+  }, [initialPayload]);
 
   useEffect(() => {
     const storedCart = window.localStorage.getItem(cartStorageKey);
@@ -157,6 +178,10 @@ export default function StoreApp({
   }, []);
 
   useEffect(() => {
+    if (view !== 'admin' || adminAuthenticated !== null) {
+      return;
+    }
+
     let active = true;
 
     async function checkAdminSession() {
@@ -182,7 +207,16 @@ export default function StoreApp({
     return () => {
       active = false;
     };
-  }, []);
+  }, [adminAuthenticated, view]);
+
+  useEffect(() => {
+    if (!notice) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => setNotice(''), 4000);
+    return () => window.clearTimeout(timeout);
+  }, [notice]);
 
   useEffect(() => {
     if (!cartReady) {
@@ -205,6 +239,8 @@ export default function StoreApp({
       setSelectedProduct(product);
       setDetailOpen(true);
       setView('catalog');
+    } else {
+      window.history.replaceState(null, '', '/catalogo');
     }
 
     setOpenedInitialProduct(true);
@@ -251,7 +287,10 @@ export default function StoreApp({
   }, [products]);
 
   const banners = useMemo(() => payload?.banners ?? [], [payload?.banners]);
-  const activeBanners = banners.filter((banner) => banner.active);
+  const activeBanners = useMemo(
+    () => banners.filter((banner) => banner.active),
+    [banners],
+  );
   const heroBanner = activeBanners[0];
   const whatsappNumber =
     payload?.settings.WHATSAPP_NUMBER.replace(/\D/g, '') || WHATSAPP_NUMBER;
@@ -266,9 +305,18 @@ export default function StoreApp({
     [category, products, search],
   );
 
-  const featuredProducts = products.filter((product) => product.featured);
-  const bestsellerProducts = products.filter((product) => product.bestseller);
-  const kitProducts = products.filter((product) => product.giftKit);
+  const featuredProducts = useMemo(
+    () => products.filter((product) => product.featured),
+    [products],
+  );
+  const bestsellerProducts = useMemo(
+    () => products.filter((product) => product.bestseller),
+    [products],
+  );
+  const kitProducts = useMemo(
+    () => products.filter((product) => product.giftKit),
+    [products],
+  );
 
   const cartLines = useMemo(
     () => resolveCartLines(cart, products),
@@ -422,6 +470,7 @@ export default function StoreApp({
     setView(nextView);
     setMobileNavOpen(false);
     window.history.pushState(null, '', pathByView[nextView]);
+    window.scrollTo({ top: 0, behavior: 'auto' });
   }
 
   function openCatalog(nextCategory = 'Todos') {
@@ -443,6 +492,7 @@ export default function StoreApp({
   }
 
   function openProduct(product: Product) {
+    productReturnPath.current = view === 'home' ? '/' : '/catalogo';
     setSelectedProduct(product);
     setDetailQuantity(1);
     setDetailOpen(true);
@@ -455,7 +505,7 @@ export default function StoreApp({
     if (!open) {
       setSelectedProduct(null);
       if (window.location.pathname.startsWith('/produto/')) {
-        window.history.replaceState(null, '', '/catalogo');
+        window.history.replaceState(null, '', productReturnPath.current);
       }
     }
   }
@@ -513,13 +563,15 @@ export default function StoreApp({
               <img
                 src="/gk-logo.png"
                 alt="Logo GK Importados e Presentes"
+                width={640}
+                height={640}
                 className="h-12 w-12 rounded-full border border-white/20 object-cover"
               />
               <div className="min-w-0">
                 <p className="truncate font-heading text-lg font-bold">
                   Painel GK
                 </p>
-                <p className="truncate text-xs font-bold uppercase tracking-[0.2em] text-white/70">
+                <p className="whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.1em] text-white/70 sm:text-xs sm:tracking-[0.2em]">
                   Área administrativa
                 </p>
               </div>
@@ -556,13 +608,15 @@ export default function StoreApp({
         ) : error ? (
           <StoreErrorState message={error} onRetry={loadStore} />
         ) : payload ? (
-          <AdminView
-            payload={payload}
-            adminAuthenticated={adminAuthenticated}
-            setAdminAuthenticated={setAdminAuthenticated}
-            refresh={loadStore}
-            setNotice={setNotice}
-          />
+          <Suspense fallback={<StoreLoadingState />}>
+            <AdminView
+              payload={payload}
+              adminAuthenticated={adminAuthenticated}
+              setAdminAuthenticated={setAdminAuthenticated}
+              refresh={loadStore}
+              setNotice={setNotice}
+            />
+          </Suspense>
         ) : null}
       </div>
     );
@@ -582,7 +636,7 @@ export default function StoreApp({
                 'Olá! Gostaria de receber atendimento personalizado da GK Importados e Presentes.',
               )}`}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="hidden items-center gap-1.5 underline decoration-white/40 underline-offset-4 transition hover:decoration-white sm:inline-flex"
             >
               Falar com a loja
@@ -590,23 +644,25 @@ export default function StoreApp({
             </a>
           </div>
         </div>
-        <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-[4.5rem] w-full max-w-7xl items-center justify-between px-4 sm:h-20 sm:px-6 lg:px-8">
           <button
             type="button"
             onClick={() => setRoute('home')}
-            className="group flex min-w-0 items-center gap-3 text-left"
+            className="group flex min-w-0 items-center gap-2.5 text-left sm:gap-3"
             aria-label="Ir para a página inicial"
           >
             <img
               src="/gk-logo.png"
               alt="Logo GK Importados e Presentes"
-              className="h-12 w-12 rounded-full border border-primary/25 object-cover shadow-[0_0_22px_rgb(181_126_62/24%)] transition group-hover:scale-105"
+              width={640}
+              height={640}
+              className="size-11 shrink-0 rounded-full border border-primary/25 object-cover shadow-[0_0_22px_rgb(181_126_62/24%)] transition group-hover:scale-105 sm:size-12"
             />
-            <span className="hidden min-w-0 sm:block">
-              <strong className="block font-heading text-lg font-bold leading-tight text-foreground">
+            <span className="block min-w-0">
+              <strong className="block truncate font-heading text-[15px] font-bold leading-tight text-foreground sm:text-lg">
                 GK Importados
               </strong>
-              <strong className="mt-0.5 block text-[13px] font-black uppercase tracking-[0.16em] text-foreground/75">
+              <strong className="mt-0.5 block truncate text-[9px] font-black uppercase tracking-[0.12em] text-foreground/75 sm:text-[13px] sm:tracking-[0.16em]">
                 E PRESENTES
               </strong>
             </span>
@@ -616,18 +672,32 @@ export default function StoreApp({
             className="hidden items-center gap-1 md:flex"
             aria-label="Principal"
           >
-            <Button
-              variant={view === 'home' ? 'secondary' : 'ghost'}
-              onClick={() => setRoute('home')}
+            <a
+              href="/"
+              className={buttonVariants({
+                variant: view === 'home' ? 'secondary' : 'ghost',
+              })}
+              onClick={(event) => {
+                event.preventDefault();
+                setRoute('home');
+              }}
+              aria-current={view === 'home' ? 'page' : undefined}
             >
               Início
-            </Button>
-            <Button
-              variant={view === 'catalog' ? 'secondary' : 'ghost'}
-              onClick={() => openCatalog()}
+            </a>
+            <a
+              href="/catalogo"
+              className={buttonVariants({
+                variant: view === 'catalog' ? 'secondary' : 'ghost',
+              })}
+              onClick={(event) => {
+                event.preventDefault();
+                openCatalog();
+              }}
+              aria-current={view === 'catalog' ? 'page' : undefined}
             >
               Catálogo
-            </Button>
+            </a>
             <Button variant="ghost" onClick={() => openHomeSection('sobre')}>
               Sobre nós
             </Button>
@@ -638,6 +708,7 @@ export default function StoreApp({
               variant="outline"
               className="h-10 px-3"
               onClick={() => setCartOpen(true)}
+              aria-label={`Abrir sacola com ${cartCount} ${cartCount === 1 ? 'item' : 'itens'}`}
             >
               <ShoppingBag />
               <span className="hidden sm:inline">Sacola</span>
@@ -650,37 +721,78 @@ export default function StoreApp({
             <Button
               variant="ghost"
               size="icon-lg"
-              className="md:hidden"
+              className="size-10 md:hidden"
               onClick={() => setMobileNavOpen((current) => !current)}
-              aria-label="Abrir menu"
+              aria-label={mobileNavOpen ? 'Fechar menu' : 'Abrir menu'}
+              aria-expanded={mobileNavOpen}
+              aria-controls="menu-mobile"
             >
               {mobileNavOpen ? <X /> : <Menu />}
             </Button>
           </div>
         </div>
-
-        {mobileNavOpen && (
-          <div className="border-t border-border bg-background px-4 py-3 md:hidden">
-            <div className="mx-auto grid max-w-7xl grid-cols-3 gap-2">
-              <Button variant="secondary" onClick={() => setRoute('home')}>
-                Início
-              </Button>
-              <Button variant="secondary" onClick={() => openCatalog()}>
-                Catálogo
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={() => openHomeSection('sobre')}
-              >
-                Sobre nós
-              </Button>
-            </div>
-          </div>
-        )}
       </header>
 
+      <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
+        <SheetContent
+          id="menu-mobile"
+          className="gap-0 border-l-primary/20 bg-background data-[side=right]:w-[min(88vw,360px)] md:hidden"
+        >
+          <SheetHeader className="border-b border-border px-5 py-5 pr-14">
+            <SheetTitle className="font-heading text-xl font-bold">
+              Menu
+            </SheetTitle>
+            <SheetDescription>Navegue pela loja GK.</SheetDescription>
+          </SheetHeader>
+          <nav className="grid gap-2 p-5" aria-label="Navegação mobile">
+            <a
+              href="/"
+              className={cn(
+                buttonVariants({
+                  variant: view === 'home' ? 'secondary' : 'ghost',
+                }),
+                'h-11 justify-start px-4',
+              )}
+              onClick={(event) => {
+                event.preventDefault();
+                setRoute('home');
+              }}
+              aria-current={view === 'home' ? 'page' : undefined}
+            >
+              Início
+            </a>
+            <a
+              href="/catalogo"
+              className={cn(
+                buttonVariants({
+                  variant: view === 'catalog' ? 'secondary' : 'ghost',
+                }),
+                'h-11 justify-start px-4',
+              )}
+              onClick={(event) => {
+                event.preventDefault();
+                openCatalog();
+              }}
+              aria-current={view === 'catalog' ? 'page' : undefined}
+            >
+              Catálogo
+            </a>
+            <Button
+              variant="ghost"
+              className="h-11 justify-start px-4"
+              onClick={() => openHomeSection('sobre')}
+            >
+              Sobre nós
+            </Button>
+          </nav>
+        </SheetContent>
+      </Sheet>
+
       {notice && (
-        <div className="fixed left-1/2 top-32 z-50 w-[min(92vw,440px)] -translate-x-1/2 rounded-lg border border-primary/25 bg-card px-4 py-3 text-sm shadow-xl">
+        <output
+          className="fixed left-1/2 top-28 z-50 w-[min(92vw,440px)] -translate-x-1/2 rounded-lg border border-primary/25 bg-card px-4 py-3 text-sm shadow-xl sm:top-32"
+          aria-live="polite"
+        >
           <div className="flex items-center justify-between gap-4">
             <span>{notice}</span>
             <Button
@@ -692,7 +804,7 @@ export default function StoreApp({
               <X />
             </Button>
           </div>
-        </div>
+        </output>
       )}
 
       {loading && !payload ? (
@@ -736,8 +848,8 @@ export default function StoreApp({
       )}
 
       <Sheet open={cartOpen} onOpenChange={setCartOpen}>
-        <SheetContent className="w-[min(100vw,460px)] border-l-primary/20 bg-card">
-          <SheetHeader className="border-b border-border px-5 py-5">
+        <SheetContent className="gap-0 border-l-primary/20 bg-card data-[side=right]:w-full sm:max-w-[460px]">
+          <SheetHeader className="border-b border-border px-4 py-5 pr-14 sm:px-5">
             <SheetTitle className="flex items-center gap-2 text-xl">
               <ShoppingBag className="size-5 text-primary" />
               Sua sacola
@@ -748,7 +860,7 @@ export default function StoreApp({
             </SheetDescription>
           </SheetHeader>
 
-          <div className="flex-1 overflow-y-auto px-5">
+          <div className="flex-1 overscroll-contain overflow-y-auto px-3 sm:px-5">
             {cartLines.length === 0 ? (
               <div className="flex min-h-80 flex-col items-center justify-center text-center">
                 <ShoppingBag className="mb-4 size-10 text-muted-foreground" />
@@ -774,12 +886,16 @@ export default function StoreApp({
                 {cartLines.map((line) => (
                   <div
                     key={line.product.id}
-                    className="grid grid-cols-[76px_1fr] gap-3 rounded-lg border border-border bg-background p-3"
+                    className="grid grid-cols-[64px_minmax(0,1fr)] gap-3 rounded-lg border border-border bg-background p-3 sm:grid-cols-[76px_minmax(0,1fr)]"
                   >
                     <img
                       src={line.product.imageUrl}
                       alt=""
-                      className="h-20 w-20 rounded-md object-cover"
+                      width={720}
+                      height={720}
+                      loading="lazy"
+                      decoding="async"
+                      className="size-16 rounded-md object-cover sm:size-20"
                     />
                     <div className="min-w-0">
                       <div className="flex items-start justify-between gap-3">
@@ -800,7 +916,7 @@ export default function StoreApp({
                           <Trash2 />
                         </Button>
                       </div>
-                      <div className="mt-3 flex items-center justify-between">
+                      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
                         <QuantityStepper
                           value={line.quantity}
                           onChange={(quantity) =>
@@ -818,7 +934,7 @@ export default function StoreApp({
             )}
           </div>
 
-          <div className="border-t border-border bg-background/70 p-5">
+          <div className="border-t border-border bg-background/70 p-4 sm:p-5">
             <div className="mb-4 flex items-center justify-between text-base">
               <span>Total dos produtos</span>
               <strong>{formatMoney(subtotal)}</strong>
@@ -850,14 +966,17 @@ export default function StoreApp({
       </Sheet>
 
       <Dialog open={detailOpen} onOpenChange={closeProduct}>
-        <DialogContent className="max-h-[92vh] overflow-y-auto border border-primary/15 bg-card p-0 sm:max-w-4xl">
+        <DialogContent className="max-h-[calc(100dvh-1rem)] w-[calc(100%-1rem)] gap-0 overflow-y-auto border border-primary/15 bg-card p-0 sm:max-h-[92vh] sm:max-w-4xl">
           {selectedProduct && (
             <div className="grid gap-0 md:grid-cols-[0.96fr_1fr]">
-              <div className="relative min-h-80 overflow-hidden rounded-t-xl bg-muted md:rounded-l-xl md:rounded-tr-none">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-t-xl bg-muted md:aspect-auto md:min-h-[520px] md:rounded-l-xl md:rounded-tr-none">
                 <img
                   src={selectedProduct.imageUrl}
                   alt={selectedProduct.name}
-                  className="h-full min-h-80 w-full object-cover"
+                  width={900}
+                  height={900}
+                  decoding="async"
+                  className="h-full w-full object-contain"
                 />
                 {!selectedProduct.available && (
                   <Badge className="absolute left-4 top-4 bg-destructive text-white">
@@ -870,12 +989,12 @@ export default function StoreApp({
                   </span>
                 )}
               </div>
-              <div className="p-6 md:p-8">
+              <div className="p-5 sm:p-6 md:p-8">
                 <DialogHeader>
                   <Badge variant="outline" className="w-fit">
                     {selectedProduct.category}
                   </Badge>
-                  <DialogTitle className="font-heading text-3xl leading-tight">
+                  <DialogTitle className="pr-8 font-heading text-2xl leading-tight sm:text-3xl">
                     {selectedProduct.name}
                   </DialogTitle>
                   <DialogDescription className="text-base">
@@ -894,7 +1013,7 @@ export default function StoreApp({
                   </p>
                 )}
 
-                <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-lg border border-border bg-background p-4">
+                <div className="mt-6 flex flex-col items-stretch justify-between gap-4 rounded-lg border border-border bg-background p-4 sm:flex-row sm:items-center">
                   <div>
                     <span className="text-sm text-muted-foreground">Preço</span>
                     <strong className="block font-heading text-2xl">
@@ -908,7 +1027,7 @@ export default function StoreApp({
                       min={1}
                     />
                     <Button
-                      className="h-10"
+                      className="h-10 flex-1 sm:flex-none"
                       disabled={!selectedProduct.available}
                       onClick={() => {
                         addToCart(selectedProduct, detailQuantity);
@@ -931,16 +1050,17 @@ export default function StoreApp({
           'Olá! Gostaria de saber mais sobre os produtos da GK Importados e Presentes.',
         )}`}
         target="_blank"
-        rel="noreferrer"
-        className="fixed bottom-5 left-4 z-40 inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#1f8f55] text-white shadow-[0_16px_35px_rgb(31_143_85/34%)] transition hover:-translate-y-0.5 hover:bg-[#177847] sm:left-6"
+        rel="noopener noreferrer"
+        className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] left-4 z-40 inline-flex size-12 items-center justify-center rounded-full bg-[#1f8f55] text-white shadow-[0_16px_35px_rgb(31_143_85/34%)] transition hover:-translate-y-0.5 hover:bg-[#177847] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white focus-visible:ring-offset-2 sm:left-6"
         aria-label="Conversar pelo WhatsApp"
       >
         <MessageCircle className="size-5" />
       </a>
 
       <Button
-        className="fixed bottom-5 right-4 z-40 h-12 rounded-full px-4 shadow-[0_16px_35px_rgb(55_33_19/24%)] sm:right-6"
+        className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-4 z-40 h-12 rounded-full px-4 shadow-[0_16px_35px_rgb(55_33_19/24%)] sm:right-6"
         onClick={() => setCartOpen(true)}
+        aria-label={`Abrir sacola com ${cartCount} ${cartCount === 1 ? 'item' : 'itens'}`}
       >
         <ShoppingBag />
         <span>{cartCount}</span>

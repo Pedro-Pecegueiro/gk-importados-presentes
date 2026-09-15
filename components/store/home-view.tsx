@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { ProductCard } from '@/components/store/product-card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   INSTAGRAM_HANDLE,
   INSTAGRAM_URL,
@@ -20,6 +20,7 @@ import {
 } from '@/lib/store-config';
 import { formatProductCount } from '@/lib/store-format';
 import type { Banner, Product } from '@/lib/store-types';
+import { cn } from '@/lib/utils';
 
 export function HomeView({
   heroBanner,
@@ -47,6 +48,7 @@ export function HomeView({
   onAdd: (product: Product) => void;
 }) {
   const heroImage = heroBanner?.imageUrl ?? '/gk-kit-presente.png';
+  const kitItems = (kitProducts.length ? kitProducts : products).slice(0, 2);
 
   return (
     <main>
@@ -54,6 +56,11 @@ export function HomeView({
         <img
           src={heroImage}
           alt=""
+          width={1600}
+          height={900}
+          decoding="async"
+          fetchPriority="high"
+          sizes="100vw"
           className="absolute inset-0 -z-20 h-full w-full object-cover"
         />
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgb(31_18_12/94%),rgb(31_18_12/72%)_42%,rgb(31_18_12/20%))]" />
@@ -64,25 +71,32 @@ export function HomeView({
               {heroBanner?.title ??
                 'Atendimento humano do início à confirmação'}
             </div>
-            <h1 className="font-heading text-5xl font-bold leading-[0.95] drop-shadow-sm sm:text-6xl lg:text-7xl">
+            <h1 className="font-heading text-4xl font-bold leading-[1.02] drop-shadow-sm sm:text-6xl sm:leading-[0.95] lg:text-7xl">
               {STORE_NAME}
             </h1>
             <p className="mt-6 max-w-xl text-lg font-medium leading-8 text-white/88">
               {heroBanner?.subtitle ??
-                'Perfumes, cosméticos, acessórios, chocolates e kits com atendimento direto pelo WhatsApp.'}
+                'Perfumes, cosméticos, acessórios e kits com atendimento direto pelo WhatsApp.'}
             </p>
             <p className="mt-3 max-w-xl text-sm font-medium leading-6 text-white/72 sm:text-base">
               Escolha na vitrine e conte com a GK para confirmar
               disponibilidade, entrega e pagamento antes de concluir.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button
-                className="h-11 bg-primary px-5 text-primary-foreground hover:bg-primary/90"
-                onClick={onCatalog}
+              <a
+                href="/catalogo"
+                className={cn(
+                  buttonVariants(),
+                  'h-11 bg-primary px-5 text-primary-foreground hover:bg-primary/90',
+                )}
+                onClick={(event) => {
+                  event.preventDefault();
+                  onCatalog();
+                }}
               >
                 {heroBanner?.ctaLabel ?? 'Explorar produtos'}
                 <ArrowRight />
-              </Button>
+              </a>
               <Button
                 variant="outline"
                 className="h-11 border-white/35 bg-white/8 px-5 text-white hover:bg-white/18 hover:text-white"
@@ -122,24 +136,24 @@ export function HomeView({
           actionLabel="Abrir catálogo"
           onAction={onCatalog}
         />
-        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-7 grid grid-cols-2 gap-3 sm:mt-8 lg:grid-cols-4">
           {PRODUCT_CATEGORIES.map((item) => (
             <button
               key={item}
               type="button"
               onClick={() => onCatalogCategory(item)}
-              className="group flex min-h-32 items-start justify-between rounded-lg border border-border bg-card p-5 text-left shadow-sm transition hover:-translate-y-1 hover:border-primary/50 hover:bg-primary/[0.035] hover:shadow-lg"
+              className="group relative flex min-h-28 min-w-0 flex-col items-start justify-between rounded-lg border border-border bg-card p-4 text-left shadow-sm transition hover:-translate-y-1 hover:border-primary/50 hover:bg-primary/[0.035] hover:shadow-lg sm:min-h-32 sm:p-5"
             >
-              <span>
-                <span className="block font-heading text-xl font-bold">
+              <span className="min-w-0 max-w-full sm:pr-9">
+                <span className="block break-words font-heading text-base font-bold leading-tight sm:text-xl">
                   {item}
                 </span>
                 <span className="mt-2 block text-sm text-muted-foreground">
                   {formatProductCount(categoryCounts.get(item) ?? 0)}
                 </span>
               </span>
-              <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary transition group-hover:bg-primary group-hover:text-primary-foreground">
-                <Package className="size-5" />
+              <span className="absolute right-4 top-4 hidden size-10 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary transition group-hover:bg-primary group-hover:text-primary-foreground sm:grid">
+                <Package className="size-4 sm:size-5" />
               </span>
             </button>
           ))}
@@ -188,18 +202,16 @@ export function HomeView({
               <ArrowRight />
             </Button>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {(kitProducts.length ? kitProducts : products.slice(0, 2)).map(
-              (product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  compact
-                  onProduct={onProduct}
-                  onAdd={onAdd}
-                />
-              ),
-            )}
+          <div className="grid snap-x snap-mandatory auto-cols-[min(86vw,18rem)] grid-flow-col gap-4 overflow-x-auto overscroll-x-contain pb-3 sm:grid-flow-row sm:grid-cols-2 sm:overflow-visible sm:pb-0">
+            {kitItems.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                compact
+                onProduct={onProduct}
+                onAdd={onAdd}
+              />
+            ))}
           </div>
         </div>
       </section>
@@ -222,6 +234,8 @@ function AboutSection() {
               <img
                 src="/gk-logo.png"
                 alt="Logo da GK Importados e Presentes"
+                width={640}
+                height={640}
                 className="size-16 rounded-full border border-primary/30 object-cover shadow-[0_12px_35px_rgb(55_33_19/15%)]"
               />
               <div className="h-px flex-1 bg-[#2f4f3c]/20" />
@@ -306,7 +320,7 @@ function AboutSection() {
             <a
               href={INSTAGRAM_URL}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-1 font-bold text-[#f2ca88] underline decoration-[#f2ca88]/45 underline-offset-4 transition hover:text-white"
             >
               {INSTAGRAM_HANDLE}
@@ -349,7 +363,7 @@ function ProductBand({
   return (
     <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
       <SectionTitle eyebrow={eyebrow} title={title} />
-      <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-7 grid snap-x snap-mandatory auto-cols-[min(86vw,18rem)] grid-flow-col gap-4 overflow-x-auto overscroll-x-contain pb-3 sm:mt-8 sm:grid-flow-row sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:pb-0 lg:grid-cols-4">
         {items.slice(0, 4).map((product) => (
           <ProductCard
             key={product.id}
@@ -373,7 +387,7 @@ function Highlight({
   text: string;
 }) {
   return (
-    <div className="border-border py-7 sm:border-r sm:px-6 sm:last:border-r-0">
+    <div className="border-b border-border py-7 last:border-b-0 sm:border-b-0 sm:border-r sm:px-6 sm:last:border-r-0">
       <div className="mb-4 inline-grid size-10 place-items-center rounded-full bg-primary/10 text-primary">
         {icon}
       </div>
@@ -405,7 +419,11 @@ function SectionTitle({
         </h2>
       </div>
       {actionLabel && onAction && (
-        <Button variant="outline" onClick={onAction}>
+        <Button
+          className="w-full sm:w-auto"
+          variant="outline"
+          onClick={onAction}
+        >
           {actionLabel}
           <ArrowRight />
         </Button>

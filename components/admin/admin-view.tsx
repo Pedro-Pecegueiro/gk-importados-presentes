@@ -104,7 +104,7 @@ export function AdminView({
             Gerencie a vitrine da loja
           </h1>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            Informe o código administrativo para cadastrar produtos, trocar
+            Informe sua senha administrativa para cadastrar produtos, trocar
             imagens, atualizar banners e configurar o WhatsApp.
           </p>
           <label className="mt-6 block">
@@ -122,7 +122,10 @@ export function AdminView({
             />
           </label>
           {adminError && (
-            <div className="mt-4 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            <div
+              className="mt-4 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+              role="alert"
+            >
               {adminError}
             </div>
           )}
@@ -155,7 +158,7 @@ export function AdminView({
           <Badge variant="outline" className="mb-4 border-primary/35">
             Administração
           </Badge>
-          <h1 className="font-heading text-4xl font-semibold">
+          <h1 className="font-heading text-3xl font-semibold sm:text-4xl">
             Gerencie a vitrine da loja
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
@@ -207,7 +210,10 @@ export function AdminView({
       </div>
 
       {adminError && (
-        <div className="fixed left-1/2 top-24 z-50 flex w-[min(92vw,520px)] -translate-x-1/2 items-center justify-between gap-3 rounded-lg border border-destructive/30 bg-card px-4 py-3 text-sm text-destructive shadow-xl">
+        <div
+          className="fixed left-1/2 top-24 z-50 flex w-[min(92vw,520px)] -translate-x-1/2 items-center justify-between gap-3 rounded-lg border border-destructive/30 bg-card px-4 py-3 text-sm text-destructive shadow-xl"
+          role="alert"
+        >
           <span>{adminError}</span>
           <Button
             type="button"
@@ -303,6 +309,9 @@ export function AdminView({
                   <img
                     src={productForm.imageUrl}
                     alt="Pré-visualização do produto"
+                    width={800}
+                    height={500}
+                    decoding="async"
                     className="h-full w-full object-cover"
                   />
                   {isPrototypeImage(productForm.imageUrl) && (
@@ -442,6 +451,10 @@ export function AdminView({
                   <img
                     src={product.imageUrl}
                     alt=""
+                    width={160}
+                    height={160}
+                    loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover"
                   />
                   {isPrototypeImage(product.imageUrl) && (
@@ -466,7 +479,7 @@ export function AdminView({
                   <div className="mt-3 flex flex-wrap gap-3 text-xs text-muted-foreground">
                     <button
                       type="button"
-                      className="inline-flex items-center gap-1"
+                      className="inline-flex min-h-10 items-center gap-1 rounded-md px-1.5 transition hover:bg-muted focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
                       onClick={() => toggleProduct(product, 'available')}
                     >
                       <Check className="size-3" />
@@ -476,7 +489,7 @@ export function AdminView({
                     </button>
                     <button
                       type="button"
-                      className="inline-flex items-center gap-1"
+                      className="inline-flex min-h-10 items-center gap-1 rounded-md px-1.5 transition hover:bg-muted focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
                       onClick={() => toggleProduct(product, 'featured')}
                     >
                       <Star className="size-3" />
@@ -569,6 +582,9 @@ export function AdminView({
                   <img
                     src={bannerForm.imageUrl}
                     alt="Pré-visualização do banner"
+                    width={960}
+                    height={540}
+                    decoding="async"
                     className="h-full w-full object-cover"
                   />
                   {isPrototypeImage(bannerForm.imageUrl) && (
@@ -671,6 +687,10 @@ export function AdminView({
                 <img
                   src={banner.imageUrl}
                   alt=""
+                  width={192}
+                  height={160}
+                  loading="lazy"
+                  decoding="async"
                   className="h-20 w-24 rounded-md object-cover"
                 />
                 <div>
@@ -724,7 +744,7 @@ export function AdminView({
           <a
             href={`https://wa.me/${settingsForm.replace(/\D/g, '')}`}
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition hover:text-primary/80"
           >
             Testar número

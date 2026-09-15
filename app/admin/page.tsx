@@ -1,5 +1,9 @@
 import StoreApp from '../store-app';
+import { getInitialStorePayload } from '@/lib/store-initial';
 
-export default function AdminPage() {
-  return <StoreApp initialView="admin" />;
+export const dynamic = 'force-dynamic';
+
+export default async function AdminPage() {
+  const initialPayload = await getInitialStorePayload();
+  return <StoreApp initialView="admin" initialPayload={initialPayload} />;
 }

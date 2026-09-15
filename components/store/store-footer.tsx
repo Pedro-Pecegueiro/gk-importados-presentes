@@ -12,12 +12,14 @@ import { formatWhatsAppNumber } from '@/lib/store-format';
 export function StoreFooter({ whatsappNumber }: { whatsappNumber: string }) {
   return (
     <footer className="border-t border-[#c99552]/35 bg-[#24170f] text-white">
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-[1.2fr_0.8fr_0.8fr] lg:px-8">
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 pb-24 pt-10 sm:px-6 sm:pb-12 md:grid-cols-[1.2fr_0.8fr_0.8fr] lg:px-8">
         <div>
           <div className="flex items-center gap-3">
             <img
               src="/gk-logo.png"
               alt=""
+              width={640}
+              height={640}
               className="h-12 w-12 rounded-full object-cover"
             />
             <div>
@@ -38,7 +40,7 @@ export function StoreFooter({ whatsappNumber }: { whatsappNumber: string }) {
             <a
               href={INSTAGRAM_URL}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="flex items-center gap-2 transition hover:text-white"
             >
               <AtSign className="size-4 shrink-0" />
@@ -47,7 +49,7 @@ export function StoreFooter({ whatsappNumber }: { whatsappNumber: string }) {
             <a
               href={`https://wa.me/${whatsappNumber}`}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="flex items-center gap-2 transition hover:text-white"
             >
               <MessageCircle className="size-4 shrink-0" />
@@ -57,7 +59,7 @@ export function StoreFooter({ whatsappNumber }: { whatsappNumber: string }) {
               <a
                 href={STORE_MAP_URL}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="flex items-start gap-2 leading-6 transition hover:text-white"
               >
                 <MapPin className="mt-1 size-4 shrink-0" />

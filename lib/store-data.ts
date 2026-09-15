@@ -115,14 +115,32 @@ function textField(value: unknown, fallback: string, maxLength: number) {
   return (trimmed || fallback).slice(0, maxLength);
 }
 
-function productSummary(details: string) {
-  const summary = details
+function productDetails(value: unknown) {
+  return textField(
+    value,
+    'Detalhes do produto, uso recomendado e composição do presente.',
+    900,
+  )
     .split(/\r?\n/)
     .map((line) => line.trim().replace(/\s+/g, ' '))
     .filter(Boolean)
+    .join('\n');
+}
+
+function productSummary(details: string) {
+  const summary = details
+    .split(/\r?\n/)
     .join(', ');
 
-  return summary.slice(0, 240);
+  if (summary.length <= 240) {
+    return summary;
+  }
+
+  const shortened = summary.slice(0, 237);
+  const lastSpace = shortened.lastIndexOf(' ');
+  const end = lastSpace >= 180 ? lastSpace : shortened.length;
+
+  return `${shortened.slice(0, end).replace(/[\s,]+$/, '')}...`;
 }
 
 function imageUrlField(value: unknown, fallback: string) {
@@ -162,11 +180,7 @@ function numberField(
 
 export function sanitizeProductInput(value: unknown): ProductInput {
   const input = (value ?? {}) as Partial<ProductInput>;
-  const details = textField(
-    input.details,
-    'Detalhes do produto, uso recomendado e composição do presente.',
-    900,
-  );
+  const details = productDetails(input.details);
 
   return {
     name: textField(input.name, 'Novo produto', 120),

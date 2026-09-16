@@ -255,12 +255,11 @@ function AboutSection() {
               exige confiança. Por isso, não somos apenas um site comum.
               Trabalhamos com um modelo de{' '}
               <strong className="font-bold text-[#24170f]">
-                curadoria e atendimento humanizado
+                curadoria e atendimento humanizado.
               </strong>
-              . Aqui, a sua escolha na vitrine se transforma em um atendimento
-              VIP pelo WhatsApp. Você não fala com robôs; nós cuidamos do seu
-              pedido de ponta a ponta, atuando como verdadeiros consultores para
-              garantir que sua escolha seja perfeita.
+              {
+                ' Aqui, a sua escolha na vitrine se transforma em um atendimento VIP pelo WhatsApp. Você não fala com robôs; nós cuidamos do seu pedido de ponta a ponta, atuando como verdadeiros consultores para garantir que sua escolha seja perfeita.'
+              }
             </p>
           </div>
 

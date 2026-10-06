@@ -1,5 +1,9 @@
 import { env } from 'cloudflare:workers';
-import { PRODUCT_CATEGORIES, WHATSAPP_NUMBER } from '@/lib/store-config';
+import {
+  DEFAULT_HERO_BANNER,
+  PRODUCT_CATEGORIES,
+  WHATSAPP_NUMBER,
+} from '@/lib/store-config';
 import type {
   Banner,
   BannerInput,
@@ -31,6 +35,7 @@ type BannerRow = {
   id: string;
   title: string;
   subtitle: string;
+  supporting_text: string;
   cta_label: string;
   image_url: string;
   active: number;
@@ -85,6 +90,7 @@ function bannerFromRow(row: BannerRow): Banner {
     id: row.id,
     title: row.title,
     subtitle: row.subtitle,
+    supportingText: row.supporting_text,
     ctaLabel: row.cta_label,
     imageUrl: row.image_url,
     active: toBool(row.active),
@@ -128,9 +134,7 @@ function productDetails(value: unknown) {
 }
 
 function productSummary(details: string) {
-  const summary = details
-    .split(/\r?\n/)
-    .join(', ');
+  const summary = details.split(/\r?\n/).join(', ');
 
   if (summary.length <= 240) {
     return summary;
@@ -203,10 +207,15 @@ export function sanitizeBannerInput(value: unknown): BannerInput {
   const input = (value ?? {}) as Partial<BannerInput>;
 
   return {
-    title: textField(input.title, 'Nova campanha', 120),
-    subtitle: textField(input.subtitle, 'Mensagem principal do banner.', 280),
-    ctaLabel: textField(input.ctaLabel, 'Ver catálogo', 40),
-    imageUrl: imageUrlField(input.imageUrl, '/gk-kit-presente.png'),
+    title: textField(input.title, DEFAULT_HERO_BANNER.title, 120),
+    subtitle: textField(input.subtitle, DEFAULT_HERO_BANNER.subtitle, 280),
+    supportingText: textField(
+      input.supportingText,
+      DEFAULT_HERO_BANNER.supportingText,
+      320,
+    ),
+    ctaLabel: textField(input.ctaLabel, DEFAULT_HERO_BANNER.ctaLabel, 40),
+    imageUrl: imageUrlField(input.imageUrl, DEFAULT_HERO_BANNER.imageUrl),
     active: booleanField(input.active, true),
     sortOrder: numberField(input.sortOrder, 100, 0, 9999),
   };
@@ -270,7 +279,7 @@ export async function listBanners() {
   const db = getDatabase();
   const rows = await db
     .prepare(
-      `SELECT id, title, subtitle, cta_label, image_url, active, sort_order,
+      `SELECT id, title, subtitle, supporting_text, cta_label, image_url, active, sort_order,
         created_at, updated_at
        FROM banners
        ORDER BY sort_order ASC, created_at ASC`,
@@ -402,14 +411,15 @@ export async function createBanner(rawInput: unknown) {
   await db
     .prepare(
       `INSERT INTO banners (
-        id, title, subtitle, cta_label, image_url, active, sort_order,
+        id, title, subtitle, supporting_text, cta_label, image_url, active, sort_order,
         created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
     .bind(
       id,
       input.title,
       input.subtitle,
+      input.supportingText,
       input.ctaLabel,
       input.imageUrl,
       input.active ? 1 : 0,
@@ -430,13 +440,14 @@ export async function updateBanner(id: string, rawInput: unknown) {
   await db
     .prepare(
       `UPDATE banners SET
-        title = ?, subtitle = ?, cta_label = ?, image_url = ?,
+        title = ?, subtitle = ?, supporting_text = ?, cta_label = ?, image_url = ?,
         active = ?, sort_order = ?, updated_at = ?
        WHERE id = ?`,
     )
     .bind(
       input.title,
       input.subtitle,
+      input.supportingText,
       input.ctaLabel,
       input.imageUrl,
       input.active ? 1 : 0,
@@ -458,7 +469,7 @@ export async function getBannerById(id: string) {
   const db = getDatabase();
   const row = await db
     .prepare(
-      `SELECT id, title, subtitle, cta_label, image_url, active, sort_order,
+      `SELECT id, title, subtitle, supporting_text, cta_label, image_url, active, sort_order,
         created_at, updated_at
        FROM banners
        WHERE id = ?`,

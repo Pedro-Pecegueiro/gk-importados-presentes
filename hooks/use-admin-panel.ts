@@ -35,6 +35,8 @@ export function useAdminPanel({
     Math.max(0, ...payload.banners.map((banner) => banner.sortOrder)) + 10,
     9999,
   );
+  const primaryBanner =
+    payload.banners.find((banner) => banner.active) ?? payload.banners[0];
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [adminError, setAdminError] = useState('');
@@ -43,10 +45,11 @@ export function useAdminPanel({
   );
   const [priceInput, setPriceInput] = useState('');
   const [adminProductSearch, setAdminProductSearch] = useState('');
-  const [bannerForm, setBannerForm] = useState<BannerFormState>(() => ({
-    ...createEmptyBannerForm(),
-    sortOrder: suggestedBannerSortOrder,
-  }));
+  const [bannerForm, setBannerForm] = useState<BannerFormState>(() =>
+    primaryBanner
+      ? bannerToForm(primaryBanner)
+      : createEmptyBannerForm(suggestedBannerSortOrder),
+  );
   const [settingsForm, setSettingsForm] = useState(
     payload.settings.WHATSAPP_NUMBER,
   );
@@ -221,12 +224,7 @@ export function useAdminPanel({
           body: JSON.stringify(bannerInputFromForm(bannerForm)),
         },
       );
-      setBannerForm({
-        ...createEmptyBannerForm(),
-        sortOrder: editing
-          ? suggestedBannerSortOrder
-          : Math.min(result.banner.sortOrder + 10, 9999),
-      });
+      setBannerForm(bannerToForm(result.banner));
       setNotice(editing ? 'Banner atualizado.' : 'Banner cadastrado.');
       await refresh();
     } catch (error) {

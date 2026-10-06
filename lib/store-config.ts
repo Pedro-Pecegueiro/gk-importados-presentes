@@ -14,6 +14,16 @@ export const STORE_MAP_URL =
 export const STORE_CONTACT_COPY =
   'Monte sua sacola sem compromisso. A loja confirma disponibilidade, entrega e formas de pagamento pelo WhatsApp antes de concluir o pedido.';
 
+export const DEFAULT_HERO_BANNER = {
+  title: 'Presentes elegantes para cada ocasião',
+  subtitle:
+    'Perfumes, cuidados e kits com acabamento de boutique para transformar escolhas simples em gestos memoráveis.',
+  supportingText:
+    'Escolha na vitrine e conte com a GK para confirmar disponibilidade, entrega e pagamento antes de concluir.',
+  ctaLabel: 'Ver catálogo',
+  imageUrl: '/gk-kit-presente.png',
+} as const;
+
 export const PRODUCT_CATEGORIES = [
   'Perfumes',
   'Body Splash',

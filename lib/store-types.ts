@@ -34,6 +34,7 @@ export type Banner = {
   id: string;
   title: string;
   subtitle: string;
+  supportingText: string;
   ctaLabel: string;
   imageUrl: string;
   active: boolean;
@@ -45,6 +46,7 @@ export type Banner = {
 export type BannerInput = {
   title: string;
   subtitle: string;
+  supportingText: string;
   ctaLabel: string;
   imageUrl: string;
   active: boolean;

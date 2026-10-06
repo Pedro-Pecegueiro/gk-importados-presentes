@@ -58,6 +58,7 @@ npm install
 Copy-Item .dev.vars.example .dev.vars
 npx wrangler d1 execute DB --local --config wrangler.local.jsonc --file drizzle/0000_initial_gk_store.sql
 npx wrangler d1 execute DB --local --config wrangler.local.jsonc --file drizzle/0001_admin_login_security.sql
+npx wrangler d1 execute DB --local --config wrangler.local.jsonc --file drizzle/0002_banner_supporting_text.sql
 npm run dev
 ```
 

@@ -32,6 +32,7 @@ export const banners = sqliteTable(
     id: text('id').primaryKey(),
     title: text('title').notNull(),
     subtitle: text('subtitle').notNull(),
+    supportingText: text('supporting_text').notNull(),
     ctaLabel: text('cta_label').notNull(),
     imageUrl: text('image_url').notNull(),
     active: integer('active', { mode: 'boolean' }).notNull(),

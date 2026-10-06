@@ -13,6 +13,7 @@ import { ProductCard } from '@/components/store/product-card';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import {
+  DEFAULT_HERO_BANNER,
   INSTAGRAM_HANDLE,
   INSTAGRAM_URL,
   PRODUCT_CATEGORIES,
@@ -47,7 +48,7 @@ export function HomeView({
   onProduct: (product: Product) => void;
   onAdd: (product: Product) => void;
 }) {
-  const heroImage = heroBanner?.imageUrl ?? '/gk-kit-presente.png';
+  const heroImage = heroBanner?.imageUrl ?? DEFAULT_HERO_BANNER.imageUrl;
   const kitItems = (kitProducts.length ? kitProducts : products).slice(0, 2);
 
   return (
@@ -68,19 +69,16 @@ export function HomeView({
           <div className="max-w-2xl">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/25 bg-black/20 px-3 py-1.5 text-xs font-bold text-white backdrop-blur-sm">
               <HeartHandshake className="size-4 text-[#e0b46f]" />
-              {heroBanner?.title ??
-                'Atendimento humano do início à confirmação'}
+              {heroBanner?.title ?? DEFAULT_HERO_BANNER.title}
             </div>
             <h1 className="font-heading text-4xl font-bold leading-[1.02] drop-shadow-sm sm:text-6xl sm:leading-[0.95] lg:text-7xl">
               {STORE_NAME}
             </h1>
             <p className="mt-6 max-w-xl text-lg font-medium leading-8 text-white/88">
-              {heroBanner?.subtitle ??
-                'Perfumes, cosméticos, acessórios e kits com atendimento direto pelo WhatsApp.'}
+              {heroBanner?.subtitle ?? DEFAULT_HERO_BANNER.subtitle}
             </p>
             <p className="mt-3 max-w-xl text-sm font-medium leading-6 text-white/72 sm:text-base">
-              Escolha na vitrine e conte com a GK para confirmar
-              disponibilidade, entrega e pagamento antes de concluir.
+              {heroBanner?.supportingText ?? DEFAULT_HERO_BANNER.supportingText}
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a
@@ -94,7 +92,7 @@ export function HomeView({
                   onCatalog();
                 }}
               >
-                {heroBanner?.ctaLabel ?? 'Explorar produtos'}
+                {heroBanner?.ctaLabel ?? DEFAULT_HERO_BANNER.ctaLabel}
                 <ArrowRight />
               </a>
               <Button

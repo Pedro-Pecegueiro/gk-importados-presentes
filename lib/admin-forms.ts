@@ -1,4 +1,4 @@
-import { PRODUCT_CATEGORIES } from '@/lib/store-config';
+import { DEFAULT_HERO_BANNER, PRODUCT_CATEGORIES } from '@/lib/store-config';
 import type {
   Banner,
   BannerInput,
@@ -31,10 +31,7 @@ export function createEmptyProductForm(sortOrder = 100): ProductFormState {
 
 export function createEmptyBannerForm(sortOrder = 100): BannerFormState {
   return {
-    title: '',
-    subtitle: '',
-    ctaLabel: 'Ver catálogo',
-    imageUrl: '/gk-kit-presente.png',
+    ...DEFAULT_HERO_BANNER,
     active: true,
     sortOrder,
   };
@@ -61,6 +58,7 @@ export function bannerToForm(banner: Banner): BannerFormState {
     id: banner.id,
     title: banner.title,
     subtitle: banner.subtitle,
+    supportingText: banner.supportingText,
     ctaLabel: banner.ctaLabel,
     imageUrl: banner.imageUrl,
     active: banner.active,

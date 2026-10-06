@@ -21,7 +21,7 @@ export const DEFAULT_HERO_BANNER = {
   supportingText:
     'Escolha na vitrine e conte com a GK para confirmar disponibilidade, entrega e pagamento antes de concluir.',
   ctaLabel: 'Ver catálogo',
-  imageUrl: '/gk-kit-presente.png',
+  imageUrl: '/gk-banner-marca.png',
 } as const;
 
 export const PRODUCT_CATEGORIES = [

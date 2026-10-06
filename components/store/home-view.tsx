@@ -62,7 +62,7 @@ export function HomeView({
           decoding="async"
           fetchPriority="high"
           sizes="100vw"
-          className="absolute inset-0 -z-20 h-full w-full object-cover"
+          className="absolute inset-0 -z-20 h-full w-full object-cover object-[72%_center] sm:object-center"
         />
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgb(31_18_12/94%),rgb(31_18_12/72%)_42%,rgb(31_18_12/20%))]" />
         <div className="mx-auto flex min-h-[72svh] max-w-7xl items-center px-4 py-14 sm:px-6 lg:px-8">
